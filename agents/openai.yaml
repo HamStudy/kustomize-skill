@@ -1,0 +1,4 @@
+interface:
+  display_name: "Kustomize Skill"
+  short_description: "Build reusable Kustomize bases and targets"
+  default_prompt: "Use $kustomize-skill to design a DRY Kustomize layout with base resources, reusable components, and minimal target directories."
