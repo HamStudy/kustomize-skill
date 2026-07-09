@@ -117,7 +117,7 @@ Quick rule:
 
 If the same scheduled task also needs one-off execution, define the CronJob and use Kubernetes to create a Job from it at runtime. If Git must render either a Job or a CronJob, keep `job/` and `cronjob/` variant bases and share pod settings through a component.
 
-For env/envFrom, volume mounts, resources, and security context shared across different container names, use named-list replacement paths from a local `PodTemplate` container such as `template.spec.containers.[name=shared].resources`. Keep image tag overrides in `images` at the leaf target so one value applies to every rendered workload.
+For env/envFrom, volume mounts, resources, and security context shared across different container names, use named-list replacement paths from a local `PodTemplate` container such as `template.spec.containers.[name=shared].resources`. If the shared fragment should be optional, put it in a small component and include that component at the variant or leaf layer that should receive it. If a layer contains multiple workloads and only some should opt in, use a marker annotation on those workloads plus component patches targeted by `annotationSelector`; keep kind-specific paths explicit, especially for CronJob. Keep image tag overrides in `images` at the leaf target so one value applies to every rendered workload.
 
 ## ConfigMaps And Secrets
 

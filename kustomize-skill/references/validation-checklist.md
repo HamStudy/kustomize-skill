@@ -53,6 +53,7 @@ Inspect rendered output for:
 - selectors stable and matching Pod template labels
 - component-owned local PodTemplate sources annotated as local config and absent from rendered output
 - shared pod-template replacements applied to every intended workload in the chosen variant family
+- opt-in pod fragments included at the intended variant or leaf layer, and marker-based patches hitting only marked workloads
 - CronJob pod-template patches written against `spec.jobTemplate.spec.template`, not `spec.template`
 - leaf targets render exactly the intended workload variant, not every possible kind
 - fields copied by `replacements` are not also expected to be overridden by later leaf patches

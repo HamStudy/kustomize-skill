@@ -9,6 +9,7 @@
 - Deployment, StatefulSet, or DaemonSet pattern
 - Whole-template copy vs selected-field copy
 - Common container fields
+- Opt-in shared pod fragments
 - Overrides and configurability
 - Component rules
 - What stays in variant wrappers
@@ -537,6 +538,78 @@ spec:
 ```
 
 This pattern defines env and resources once, while the wrapper keeps kind-specific shape, ports, command, args, and schedule.
+
+## Opt-In Shared Pod Fragments
+
+Use component inclusion as the normal opt-in switch. Include a shared pod-fragment component at the lowest layer that should own the behavior:
+
+- Put `components/shared-env` in `cronjob/kustomization.yaml` when every target that extends `../cronjob` should inherit the shared env.
+- Put `components/shared-env` only in `prod/kustomization.yaml` when only that leaf target should receive it.
+- Put `components/shared-env`, `components/shared-volumes`, and `components/resources-small` in separate components when targets should choose them independently.
+
+This keeps the target expression small: the target says what pod fragments it wants by listing components, while the component owns the repeated field details.
+
+When a layer contains several workloads and only some should receive a fragment, use a marker annotation on the workload plus a component patch targeted by `annotationSelector`. This is useful for opt-in `envFrom`, volumes, volume mounts, or resource defaults when the patch owns the field it writes.
+
+Workload marker:
+
+```yaml
+metadata:
+  name: api
+  annotations:
+    kustomize.example.com/shared-env: app
+```
+
+Component patch:
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+patches:
+  - target:
+      kind: Deployment
+      annotationSelector: kustomize.example.com/shared-env=app
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: ignored
+      spec:
+        template:
+          spec:
+            containers:
+              - name: api
+                envFrom:
+                  - configMapRef:
+                      name: app-env
+  - target:
+      kind: CronJob
+      annotationSelector: kustomize.example.com/shared-env=app
+    patch: |-
+      apiVersion: batch/v1
+      kind: CronJob
+      metadata:
+        name: ignored
+      spec:
+        jobTemplate:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: cleanup
+                    envFrom:
+                      - configMapRef:
+                          name: app-env
+```
+
+The `metadata.name` inside each strategic-merge patch is a required patch shape placeholder; the `target` selector decides which rendered resources receive the patch.
+
+If a target extends a variant base that already includes this component, the shared fragment is inherited automatically. If the component is listed only in a leaf target, only that leaf receives it.
+
+Prefer exact kind/name replacement targets when the component knows the workload names and should copy fields from a local `PodTemplate`. Prefer marker-based patches when the workload itself should declare "apply this shared env/mount/resource profile to me." Patch targets support annotation and label selectors; replacement targets should be kept to explicit kind/name/namespace-style selection and exact field paths.
+
+For generated ConfigMaps and Secrets, keep the generator in `base/` or the variant resource chain when leaves need `behavior: merge` or `replace`. The opt-in component can still reference the stable generator name such as `app-env`; Kustomize rewrites normal workload references to the hashed generated name in rendered output.
 
 ## Overrides And Configurability
 
