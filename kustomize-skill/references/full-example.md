@@ -26,6 +26,8 @@ Create a Kustomize layout where a tiny target kustomization renders a complete a
 
 This example favors readability over every possible production knob.
 
+This example keeps the optional maintenance CronJob as a small component because it is a different task shape from the API Deployment. When the same pod shape can render as either Job/CronJob or Deployment/StatefulSet/DaemonSet, use the variant-base and local `PodTemplate` patterns in `pod-template-dry-patterns.md`.
+
 ## File Tree
 
 ```text

@@ -108,6 +108,8 @@ Each component should have one job. A component may include:
 - replacements to wire names or values
 - transformer configuration for CRD fields
 
+If leaf targets need to override a generated ConfigMap or Secret with generator `behavior: merge` or `replace`, keep that generator in a base or variant resource chain instead of defining it only inside a component.
+
 Do not make a component that silently assumes five unrelated features. Compose several small components from the target directory instead.
 
 ## Environment And Cluster Matrix

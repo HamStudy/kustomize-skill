@@ -107,7 +107,7 @@ If only some environments run the job, move the CronJob into a component such as
 
 ## Pod-Template-Bearing Resources
 
-Deployment, StatefulSet, DaemonSet, ReplicaSet, Job, and CronJob resources all define Pods, but the Pod template is nested differently for CronJob. When common pod details repeat across kinds, prefer a pod-template profile component instead of copying full resources. See `pod-template-dry-patterns.md`.
+Deployment, StatefulSet, DaemonSet, ReplicaSet, Job, and CronJob resources all define Pods, but the Pod template is nested differently for CronJob. When a workload can be one of a few compatible kinds, prefer variant bases such as `job/` and `cronjob/` or `deployment/` and `statefulset/`, all sharing a component that contains a local `PodTemplate` plus `replacements`. See `pod-template-dry-patterns.md`.
 
 Quick rule:
 
@@ -115,7 +115,9 @@ Quick rule:
 - `CronJob`: pod template is under `spec.jobTemplate.spec.template`.
 - CRD workload controllers may look similar but need explicit transformer configuration, replacements, or per-CRD patches.
 
-If the same scheduled task also needs one-off execution, define the CronJob and use Kubernetes to create a Job from it at runtime. If Git must render either a Job or a CronJob, keep tiny wrapper resources and share pod settings through a component.
+If the same scheduled task also needs one-off execution, define the CronJob and use Kubernetes to create a Job from it at runtime. If Git must render either a Job or a CronJob, keep `job/` and `cronjob/` variant bases and share pod settings through a component.
+
+For env/envFrom, volume mounts, resources, and security context shared across different container names, use named-list replacement paths from a local `PodTemplate` container such as `template.spec.containers.[name=shared].resources`. Keep image tag overrides in `images` at the leaf target so one value applies to every rendered workload.
 
 ## ConfigMaps And Secrets
 

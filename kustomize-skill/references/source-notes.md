@@ -61,6 +61,10 @@ The generator docs emphasize that ConfigMap and Secret generators append content
 
 Kustomize transformer configuration examples list built-in ConfigMap and Secret reference paths for Pod, Deployment, ReplicaSet, DaemonSet, StatefulSet, Job, and CronJob. Those examples show the core pod-template path split: most workload controllers use `spec.template`, while CronJob uses `spec.jobTemplate.spec.template`.
 
+The replacements docs show local-config resources can be replacement sources, and field paths can address nested maps, lists, and named list entries. Component docs show components can bundle resources, generators, patches, and transformation logic. Together, these enable a component-owned local `PodTemplate` source to copy structured pod-template fields into differently shaped workload resources.
+
+Local render checks with kubectl's embedded Kustomize showed leaf `configMapGenerator behavior: merge` did not merge a generator defined only inside a component. Put generators that leaf targets must merge or replace in a base or variant resource chain; keep component generators for fixed component-owned config.
+
 The CRD and OpenAPI docs note that Kustomize needs schema or transformer configuration to understand custom resource merge keys and object references. For CRDs, verify rendered output rather than assuming built-in behavior.
 
 Argo CD supports Kustomize overlays and components, can apply inline Kustomize patches in an Application or ApplicationSet, and has explicit Kustomize version/build-option handling. In this skill, that conceptual overlay can be a sibling target directory such as `prod/`; it does not require an `overlays/` parent directory. Argo CD's docs note `ignoreMissingComponents` for default/override patterns.

@@ -51,8 +51,12 @@ Inspect rendered output for:
 - patches applying to the intended target only
 - no unresolved placeholder values such as `REPLACE_ME` or `$(VAR)`
 - selectors stable and matching Pod template labels
-- shared pod-template patches applied to every intended Deployment, StatefulSet, DaemonSet, Job, or CronJob
+- component-owned local PodTemplate sources annotated as local config and absent from rendered output
+- shared pod-template replacements applied to every intended workload in the chosen variant family
 - CronJob pod-template patches written against `spec.jobTemplate.spec.template`, not `spec.template`
+- leaf targets render exactly the intended workload variant, not every possible kind
+- fields copied by `replacements` are not also expected to be overridden by later leaf patches
+- generators intended for leaf `behavior: merge` or `replace` live in a base/variant resource chain, not only inside a component
 - CronJobs with intended schedule, suspend state, and image
 - Certificates, Ingresses, and Gateway resources agreeing on hostnames and TLS Secret names
 - CRD fields transformed as intended
@@ -92,7 +96,9 @@ Ask these before handing off:
 - Could this target kustomization be shorter without losing clarity?
 - Is an optional feature copied into multiple targets instead of modeled as a component?
 - Is a patch doing what `images`, `replicas`, `labels`, `namespace`, or generator behavior already does?
-- Is repeated pod-template YAML handled by a profile component instead of full resource copies?
+- Is repeated pod-template YAML copied from a component-owned local `PodTemplate` source instead of repeated in full resources?
+- If a value must be overridden, is it owned by `images`, generator merge data, a variant wrapper, or a separate component instead of a patch that fights a replacement?
+- If config should be overridden with generator behavior, is the original generator reachable through `resources` rather than only through `components`?
 - Does a base resource depend on a resource generated only in a target kustomization?
 - Is a CRD field relying on a built-in transformer that does not know the CRD schema?
 - Are remote bases pinned?

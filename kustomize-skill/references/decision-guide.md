@@ -25,7 +25,7 @@ Components should model feature switches or cross-cutting bundles:
 - external database wiring
 - observability sidecars or ServiceMonitor resources
 - optional CronJobs
-- pod-template profiles shared by Deployments, StatefulSets, DaemonSets, Jobs, and CronJobs
+- pod-template components shared by compatible variant families, such as Job/CronJob or Deployment/StatefulSet/DaemonSet
 - cloud-specific identity annotations
 - ExternalSecret or SealedSecret integration
 - PodDisruptionBudget, HPA, or NetworkPolicy bundles if not universal
@@ -92,7 +92,7 @@ Put in target directories such as `dev/`, `staging/`, `prod/`, or `clusters/<clu
 
 Use `resources` when adding complete YAML documents or another Kustomization directory.
 
-Use `components` when the same optional capability is selected by more than one target, especially when the capability needs both resources and patches.
+Use `components` when the same optional capability is selected by more than one target, especially when the capability bundles resources, generators, replacements, patches, or transformer configuration.
 
 Use `configMapGenerator` for non-secret config from files, env files, or literals. Prefer a generator in the base when a workload references the ConfigMap, then merge or replace values from targets.
 
@@ -110,7 +110,9 @@ Use `patches` for small structural changes. Prefer file patches over long inline
 
 Use `replacements` when one rendered field must be copied into one or more target fields. This is the replacement for `vars` and is useful for generated names, CRD fields, and command/env fields.
 
-Use a pod-template profile component when several resource kinds share container settings, env/envFrom, resources, security context, service account, volumes, volume mounts, probes, node placement, or topology spread. Read `references/pod-template-dry-patterns.md` before inventing a custom fragment system.
+Use variant bases plus a component containing a local `PodTemplate` and `replacements` when a workload can be one of several compatible kinds, such as Job/CronJob or Deployment/StatefulSet/DaemonSet. Read `references/pod-template-dry-patterns.md` before inventing a custom fragment system.
+
+Use selected-field replacements from a local `PodTemplate` when different workload kinds should share env/envFrom, resources, volume mounts, security context, or service account but keep their own command, args, ports, schedule, or controller-specific fields.
 
 Use `configurations`, `crds`, or `openapi` when custom resources need name reference, image reference, or strategic merge semantics that built-in transformers do not know.
 
@@ -125,7 +127,8 @@ When a target starts copying whole manifests, stop and ask:
 - Can a generated ConfigMap/Secret be merged instead of replaced as YAML?
 - Can `images`, `replicas`, `labels`, or `namespace` express this without a patch?
 - Can a replacement wire this value instead of duplicating names?
-- Is the repeated YAML a pod-template concern that belongs in a profile component?
+- Is the repeated YAML a pod-template concern that can be copied from a component-owned local `PodTemplate` source?
+- Should this be a variant base such as `job/`, `cronjob/`, `deployment/`, or `statefulset/` that leaf targets extend?
 - Is the difference real environment behavior, or just a parameter that belongs in a small patch?
 
 The ideal target kustomization is a readable bill of materials for a deployment target.

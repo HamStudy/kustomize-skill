@@ -92,8 +92,8 @@ or per generated resource:
 ```yaml
 secretGenerator:
   - name: webhook-token
-    literals:
-      - token=replace-me
+    envs:
+      - secrets/webhook.env
     options:
       disableNameSuffixHash: true
 ```
