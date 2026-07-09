@@ -59,6 +59,8 @@ The `patches` field is the modern unified patch entry point. It supports strateg
 
 The generator docs emphasize that ConfigMap and Secret generators append content hashes by default and Kustomize can update workload references. Keep that behavior unless a stable external name is required.
 
+Kustomize transformer configuration examples list built-in ConfigMap and Secret reference paths for Pod, Deployment, ReplicaSet, DaemonSet, StatefulSet, Job, and CronJob. Those examples show the core pod-template path split: most workload controllers use `spec.template`, while CronJob uses `spec.jobTemplate.spec.template`.
+
 The CRD and OpenAPI docs note that Kustomize needs schema or transformer configuration to understand custom resource merge keys and object references. For CRDs, verify rendered output rather than assuming built-in behavior.
 
 Argo CD supports Kustomize overlays and components, can apply inline Kustomize patches in an Application or ApplicationSet, and has explicit Kustomize version/build-option handling. In this skill, that conceptual overlay can be a sibling target directory such as `prod/`; it does not require an `overlays/` parent directory. Argo CD's docs note `ignoreMissingComponents` for default/override patterns.

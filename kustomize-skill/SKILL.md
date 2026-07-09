@@ -1,6 +1,6 @@
 ---
 name: kustomize-skill
-description: Build, review, refactor, or explain Kubernetes manifests that use Kustomize. Use for designing DRY base/target/component layouts, creating minimal reusable deployment targets without a central overlays directory, using configMapGenerator and secretGenerator, writing patches and replacements, handling cert-manager Certificates, CronJobs, ConfigMaps, Secrets, CRDs, GitOps rendering, and validating multi-file Kustomize output.
+description: Build, review, refactor, or explain Kubernetes manifests that use Kustomize. Use for designing DRY base/target/component layouts, creating minimal reusable deployment targets without a central overlays directory, sharing pod-template configuration across Deployments, StatefulSets, DaemonSets, Jobs, and CronJobs, using configMapGenerator and secretGenerator, writing patches and replacements, handling cert-manager Certificates, CronJobs, ConfigMaps, Secrets, CRDs, GitOps rendering, and validating multi-file Kustomize output.
 ---
 
 # Kustomize Skill
@@ -26,6 +26,7 @@ Read only the references needed for the current task:
 - `references/layout-patterns.md`: directory structures for sibling target directories, app/env/cluster matrices, and component libraries.
 - `references/generators-and-secrets.md`: ConfigMap/Secret generators, hash suffixes, merge/replace behavior, immutable generated resources, and Git-safe secret patterns.
 - `references/patches-replacements-crds.md`: unified patches, replacements instead of vars, CRD transformer gaps, OpenAPI, and name/image reference wiring.
+- `references/pod-template-dry-patterns.md`: DRY patterns for resources that own Pod templates, including Deployment, StatefulSet, DaemonSet, Job, CronJob, and CRD-like workload controllers.
 - `references/resource-recipes.md`: practical recipes for Deployments, Services, CronJobs, cert-manager Certificates, Ingress, NetworkPolicy, RBAC, and ExternalSecret-style resources.
 - `references/full-example.md`: a compact multi-file app that renders Deployments, Services, ConfigMaps, Secrets, CronJobs, Certificates, Ingress, and environment targets with little target YAML.
 - `references/validation-checklist.md`: commands and review checks before handing off a Kustomize change.

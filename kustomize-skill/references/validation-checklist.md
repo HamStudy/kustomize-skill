@@ -51,6 +51,8 @@ Inspect rendered output for:
 - patches applying to the intended target only
 - no unresolved placeholder values such as `REPLACE_ME` or `$(VAR)`
 - selectors stable and matching Pod template labels
+- shared pod-template patches applied to every intended Deployment, StatefulSet, DaemonSet, Job, or CronJob
+- CronJob pod-template patches written against `spec.jobTemplate.spec.template`, not `spec.template`
 - CronJobs with intended schedule, suspend state, and image
 - Certificates, Ingresses, and Gateway resources agreeing on hostnames and TLS Secret names
 - CRD fields transformed as intended
@@ -90,6 +92,7 @@ Ask these before handing off:
 - Could this target kustomization be shorter without losing clarity?
 - Is an optional feature copied into multiple targets instead of modeled as a component?
 - Is a patch doing what `images`, `replicas`, `labels`, `namespace`, or generator behavior already does?
+- Is repeated pod-template YAML handled by a profile component instead of full resource copies?
 - Does a base resource depend on a resource generated only in a target kustomization?
 - Is a CRD field relying on a built-in transformer that does not know the CRD schema?
 - Are remote bases pinned?

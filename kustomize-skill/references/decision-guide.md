@@ -25,6 +25,7 @@ Components should model feature switches or cross-cutting bundles:
 - external database wiring
 - observability sidecars or ServiceMonitor resources
 - optional CronJobs
+- pod-template profiles shared by Deployments, StatefulSets, DaemonSets, Jobs, and CronJobs
 - cloud-specific identity annotations
 - ExternalSecret or SealedSecret integration
 - PodDisruptionBudget, HPA, or NetworkPolicy bundles if not universal
@@ -109,6 +110,8 @@ Use `patches` for small structural changes. Prefer file patches over long inline
 
 Use `replacements` when one rendered field must be copied into one or more target fields. This is the replacement for `vars` and is useful for generated names, CRD fields, and command/env fields.
 
+Use a pod-template profile component when several resource kinds share container settings, env/envFrom, resources, security context, service account, volumes, volume mounts, probes, node placement, or topology spread. Read `references/pod-template-dry-patterns.md` before inventing a custom fragment system.
+
 Use `configurations`, `crds`, or `openapi` when custom resources need name reference, image reference, or strategic merge semantics that built-in transformers do not know.
 
 Use Helm inflation sparingly. If Helm is the source package format, render it deliberately and pin versions. Do not hide broad Helm behavior inside Kustomize unless the deployment system supports the required `--enable-helm` behavior.
@@ -122,6 +125,7 @@ When a target starts copying whole manifests, stop and ask:
 - Can a generated ConfigMap/Secret be merged instead of replaced as YAML?
 - Can `images`, `replicas`, `labels`, or `namespace` express this without a patch?
 - Can a replacement wire this value instead of duplicating names?
+- Is the repeated YAML a pod-template concern that belongs in a profile component?
 - Is the difference real environment behavior, or just a parameter that belongs in a small patch?
 
 The ideal target kustomization is a readable bill of materials for a deployment target.

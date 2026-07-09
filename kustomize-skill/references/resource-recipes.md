@@ -4,6 +4,7 @@
 
 - Deployments and Services
 - CronJobs
+- Pod-template-bearing resources
 - ConfigMaps and Secrets
 - cert-manager Certificates
 - Ingress and Gateway resources
@@ -103,6 +104,18 @@ Patch schedule, suspend, or resources in target kustomizations:
 ```
 
 If only some environments run the job, move the CronJob into a component such as `components/maintenance-cron/`.
+
+## Pod-Template-Bearing Resources
+
+Deployment, StatefulSet, DaemonSet, ReplicaSet, Job, and CronJob resources all define Pods, but the Pod template is nested differently for CronJob. When common pod details repeat across kinds, prefer a pod-template profile component instead of copying full resources. See `pod-template-dry-patterns.md`.
+
+Quick rule:
+
+- `Deployment`, `StatefulSet`, `DaemonSet`, `ReplicaSet`, and `Job`: pod template is under `spec.template`.
+- `CronJob`: pod template is under `spec.jobTemplate.spec.template`.
+- CRD workload controllers may look similar but need explicit transformer configuration, replacements, or per-CRD patches.
+
+If the same scheduled task also needs one-off execution, define the CronJob and use Kubernetes to create a Job from it at runtime. If Git must render either a Job or a CronJob, keep tiny wrapper resources and share pod settings through a component.
 
 ## ConfigMaps And Secrets
 
